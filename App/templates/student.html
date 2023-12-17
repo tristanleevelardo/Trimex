@@ -1,0 +1,185 @@
+{% load static %}
+{% if user.is_authenticated %}
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Page</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+    <!-- Include Font Awesome -->
+    <script src="https://kit.fontawesome.com/2e36db1f7d.js" crossorigin="anonymous"></script>
+
+    <style>
+        body {
+            background-image: url('{% static 'images/background_login.jpg' %}');
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin-bottom: 80px; /* Adjust margin to accommodate the footer */
+        }
+
+        .jumbotron {
+            background-color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #f8f9fa; /* Adjust background color as needed */
+            text-align: center;
+            padding: 10px;
+            white-space: nowrap; /* Prevent line breaks */
+            overflow-x: auto; /* Enable horizontal scrolling if needed */
+        }
+
+        .footer a {
+            display: inline-block;
+            margin-right: 10px; /* Adjust spacing between icons */
+            color: #343a40; /* Set icon color */
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'student' student_name=student.name %}">Trimex Student Portal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'mail_student' student_name=student.name %}">Mail</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'student_profile' student_name=student.name %}">Profile</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+
+            <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-danger{% endif %} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            
+            {% endfor %}
+          {% endif %}
+    </div>
+
+<div class="jumbotron">
+    <h1 class="display-4 text-center">Welcome, {{ user.username}}!</h1>
+    <p class="lead text-center">Here are your grades for the current semester.</p>
+</div>
+<br>
+<div class="container">
+    {% if subjects %}
+        <div class="table-responsive">
+            <table class="table table-dark table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">Subject</th>
+                        <th scope="col">Written Output</th>
+                        <th scope="col">Performance Task</th>
+                        <th scope="col">Prelim</th>
+                        <th scope="col">Midterm</th>
+                        <th scope="col">Finals</th>
+                        <th scope="col">Grade</th>
+                        <th scope="col">Instructor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                        <tr>
+                            <td>{{ subject.subject }}</td>
+                            <td>{{ subject.writtenOutput }}</td>
+                            <td>{{ subject.performanceTask }}</td>
+                            <td>{{ subject.prelim}}</td>
+                            <td>{{ subject.midterm }}</td>
+                            <td>{{ subject.finals }}</td>
+                            <td>{{ subject.grade }}</td>
+                            <td><a href="{% url 'mail_message' student_name=subject.student_fullName instructor_name=subject.instructor_fullName %}">{{ subject.instructor_lastName }}</a></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% endif %}
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <p>Experiencing a problem? Connect with us:</p>
+        <!-- Add your social media icons and links here -->
+        <a href="#" class="me-2"><i class="fab fa-facebook"></i></a>
+        <a href="#" class="me-2"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="me-2"><i class="fab fa-instagram"></i></a>
+    </div>
+</footer>
+<script>
+    //const socket = new WebSocket('ws://127.0.0.1:8000/ws/student/{{ student.name }}/');
+    // const socket = new WebSocket('ws://192.168.100.12:8000/ws/student/{{ student.name }}/'); 
+    // const socket = new WebSocket('wss://trimex-89eb7718af1d.herokuapp.com/ws/student/{{ student.name }}/'); 
+
+
+    socket.onopen = function (event) {
+        console.log('WebSocket connection opened:', event);
+    };
+
+    socket.onmessage = function (event) {
+        console.log('WebSocket message received:', event);
+        const data = JSON.parse(event.data);
+        const message = data.message;
+
+        // Show notification
+        if (Notification.permission === 'granted') {
+            new Notification('New Notification', {
+                body: message,
+            });
+        }
+    };
+
+    socket.onclose = function (event) {
+        console.log('WebSocket connection closed:', event);
+    };
+</script>
+
+<script>
+    if (Notification.permission !== 'granted') {
+        Notification.requestPermission().then(function (permission) {
+            if (permission === 'granted') {
+                console.log('Notification permission granted');
+            }
+        });
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>
+
+{% else %}
+
+<script>
+    window.location.href = "{% url 'home' %}";  // Redirect to the 'student' page
+</script>
+
+{% endif %}

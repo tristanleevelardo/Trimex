@@ -1,0 +1,126 @@
+{% load static %}
+{% if user.is_authenticated %}
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trimex Admin Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+    <style>
+        body {
+            background-image: url('{% static 'images/background_login.jpg' %}');
+            background-repeat: no-repeat;
+            background-size: cover;
+            margin-bottom: 80px; /* Adjust margin to accommodate the footer */
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Trimex Admin Portal</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+{% if messages %}
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+    {% for message in messages %}
+        {{ message }}
+    {% endfor %}
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+{% endif %}
+
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Student Register</h5>
+                        <p class="card-text">Register new students.</p>
+                        <a href="{% url 'studentRegister' admin_username=admin_username %}" class="btn btn-primary">Add Students</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Faculty Register</h5>
+                        <p class="card-text">Register new faculty members.</p>
+                        <a href="{% url 'facultyRegister' admin_username=admin_username %}" class="btn btn-success">Add Faculty</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Assign</h5>
+                        <p class="card-text">Assign students and faculty.</p>
+                        <a href="{% url 'assign' admin_username=admin_username %}" class="btn btn-warning">Assign </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Units</h5>
+                        <p class="card-text">Assign Units and faculty.</p>
+                        <a href="{% url 'units' admin_username=admin_username %}" class="btn btn-info">Units </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Graph</h5>
+                        <p class="card-text">Show Students Performance</p>
+                        <a href="{% url 'predict' admin_username=admin_username %}" class="btn btn-dark">Graph </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-3 mb-3">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Full Database View</h5>
+                        <p class="card-text">View the entire database.</p>
+                        <a href="{% url 'admin:index' %}" class="btn btn-danger">Database</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+
+</body>
+</html>
+
+{% else %}
+
+<script>
+    window.location.href = "{% url 'home' %}";  // Redirect to the 'home' page
+</script>
+
+{% endif %}
